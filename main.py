@@ -1,7 +1,10 @@
 import flask
 from flask import Flask, request, jsonify
+from Modules.binaries import binaries_bp
 
 app = Flask(__name__)
+
+app.register_blueprint(binaries_bp)
 
 @app.route('/')
 def index():
