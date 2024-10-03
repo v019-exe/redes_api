@@ -1,9 +1,10 @@
+
 from flask import Blueprint, request, jsonify
 
 binaries_bp = Blueprint('binaries', __name__)
 
 class Binaries:
-  @binaries_bp.route('/convert_decimal_bin', methods=['GET'])
+  @binaries_bp.route('/api/binaries/convert_decimal_bin', methods=['GET'])
   def convert_decimal_bin():
     decimal = request.args.get('decimal')
     if decimal is None:
@@ -14,7 +15,7 @@ class Binaries:
     }
     return jsonify(data), 200
 
-  @binaries_bp.route('/convert_bin_decimal', methods=['GET'])
+  @binaries_bp.route('/api/binaries/convert_bin_decimal', methods=['GET'])
   def convert_bin_decimal():
     binary = request.args.get('bin')
     if binary is None:
@@ -25,7 +26,7 @@ class Binaries:
     }
     return jsonify(data), 200
 
-  @binaries_bp.route('/convert_hex_bin', methods=['GET'])
+  @binaries_bp.route('/api/binaries/convert_hex_bin', methods=['GET'])
   def convert_hex_bin():
     hex = request.args.get('hex')
     if hex is None:
@@ -36,7 +37,7 @@ class Binaries:
     }
     return jsonify(data)
 
-  @binaries_bp.route('/convert_bin_hex', methods=['GET'])
+  @binaries_bp.route('/api/binaries/convert_bin_hex', methods=['GET'])
   def convert_bin_hex():
     bin = request.args.get('bin')
     if bin is None:
@@ -48,7 +49,7 @@ class Binaries:
     }
     return jsonify(data)
 
-  @binaries_bp.route('/convert_oct_bin', methods=['GET'])
+  @binaries_bp.route('/api/binaries/convert_oct_bin', methods=['GET'])
   def convert_oct_bin():
     oct = request.args.get('oct')
     if oct is None:

@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 redes_bp = Blueprint('redes', __name__)
 
 class Redes:
-  @redes_bp.route('/cidr_to_netmask', methods=['GET'])
+  @redes_bp.route('/api/redes/cidr_to_netmask', methods=['GET'])
   def cidr_to_netmask():
     cidr = request.args.get('cidr')
     if cidr is None:
@@ -45,7 +45,7 @@ class Redes:
         return jsonify(data), 200
     return jsonify({"error": "No se ha encontrado una CIDR válida"}), 400
 
-  @redes_bp.route('/netmask_to_cidr', methods=['GET'])
+  @redes_bp.route('/api/redes/netmask_to_cidr', methods=['GET'])
   def netmask_to_cidr():
     cidrs_invertido = {
       "255.0.0.0": "/8",
