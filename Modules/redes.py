@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+import ipaddress
 
 redes_bp = Blueprint('redes', __name__)
 
@@ -87,4 +88,91 @@ class Redes:
         return jsonify(data), 200
     return jsonify({"error": "No se ha encontrado una netmask válida"}), 400
 
+  @redes_bp.route("/api/redes/get-class", methods=["GET"])
+  def get_class():
+    ip = request.args.get("ip")
+    if ip is None:
+      return jsonify({"error": "No se ha introducido IP"}), 400
+    
+    splitted_ip = ip.split(".")
+    if 1 <= int(splitted_ip[0]) <= 127 and 0 <= int(splitted_ip[1]) <= 255:
+                    data = {
+                        "Clase": "A",
+                        "Default Mask": "255.0.0.0"
+                    }
+    elif 128 <= int(splitted_ip[0]) <= 191 and 0 <= int(splitted_ip[1]) <= 255:
+                    data = {
+                        "Clase": "B",
+                        "Default Mask": "255.255.0.0"
+                    }
+    elif 192 <= int(splitted_ip[0]) <= 223 and 0 <= int(splitted_ip[1]) <= 255:
+                    data = {
+                        "Clase": "C",
+                        "Default Mask": "255.255.255.0"
+                    }
+    else:
+                    data = {
+                        "Error": "Dirección IP fuera de los rangos conocidos"
+                    }
+                    return jsonify(data), 400
+
+    return jsonify(data), 200
+  
+  @redes_bp.route("/api/redes/subnets", methods=["GET"])
+  @redes_bp.route("/api/redes/subnets", methods=["GET"])
+  def subnets():
+      ip = request.args.get("ip")
+      if ip is None:
+          return jsonify({"error": "No se ha introducido IP"}), 400
+
+      mask = request.args.get("mask")
+      if mask is None:
+          return jsonify({"error": "No se ha introducido mask"}), 400
+
+      new_prefix = request.args.get("new_prefix")
+      
+      try:
+          
+          network = ipaddress.ip_network(f"{ip}/{mask}", strict=False)
+      except ValueError:
+          return jsonify({"error": "IP o máscara inválida"}), 400
+
+
+      first_octet = int(ip.split(".")[0])
+      if first_octet < 128:
+          ip_class = "A"
+      elif first_octet < 192:
+          ip_class = "B"
+      elif first_octet < 224:
+          ip_class = "C"
+      else:
+          ip_class = "No soportado"
+
+      
+      try:
+          if new_prefix:
+              new_prefix = int(new_prefix)
+
+              subnets = [{
+                  "subred": str(subnet.network_address),
+                  "rango": f"{subnet.network_address + 1} - {subnet.broadcast_address - 1}",
+                  "broadcast": str(subnet.broadcast_address)
+              } for subnet in network.subnets(new_prefix=new_prefix)]
+          else:
+            
+              subnets = [{
+                  "subred": str(subnet.network_address),
+                  "rango": f"{subnet.network_address + 1} - {subnet.broadcast_address - 1}",
+                  "broadcast": str(subnet.broadcast_address)
+              } for subnet in network.subnets()]
+      except ValueError:
+          return jsonify({"error": "Prefijo inválido"}), 400
+
+      return jsonify({
+          "ip": ip,
+          "mask": mask,
+          "clase": ip_class,
+          "subredes": subnets
+      })
+        
 redes = Redes()
